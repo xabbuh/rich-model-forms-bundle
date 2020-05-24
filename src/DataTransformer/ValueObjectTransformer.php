@@ -88,7 +88,7 @@ class ValueObjectTransformer implements DataTransformerInterface
             return $this->propertyAccessor->getValue($object, $form->getPropertyPath());
         }
 
-        $readPropertyPath = $form->getFormConfig()->getOption('read_property_path') ?? $form->getName();
+        $readPropertyPath = $form->getOption('factory_argument') ?? $form->getFormConfig()->getOption('read_property_path') ?? $form->getName();
 
         if ($readPropertyPath instanceof \Closure) {
             return $readPropertyPath($object);

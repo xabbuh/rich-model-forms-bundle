@@ -66,6 +66,42 @@ class ValueObjectsTest extends TestCase
         $this->assertSame('19', $form->get('taxRate')->getViewData());
     }
 
+    public function testTransformCompoundRootFormWithPropertyPath(): void
+    {
+        $form = $this->createForm(GrossPriceType::class, null, [
+            'factory' => GrossPrice::class,
+            'immutable' => true,
+            'tax_rate_field_name' => 'tax',
+            'tax_rate_field_options' => [
+                'factory_argument' => 'taxRate',
+            ],
+        ]);
+        $form->submit([
+            'amount' => '650',
+            'tax' => '7',
+        ]);
+
+        $this->assertEquals(new GrossPrice(650, 7), $form->getData());
+    }
+
+    public function testTransformCompoundRootFormWithPropertyPathWithInitialData(): void
+    {
+        $form = $this->createForm(GrossPriceType::class, new GrossPrice(500, 19), [
+            'factory' => GrossPrice::class,
+            'immutable' => true,
+            'tax_rate_field_name' => 'tax',
+            'tax_rate_field_options' => [
+                'factory_argument' => 'taxRate',
+            ],
+        ]);
+        $form->submit([
+            'amount' => '650',
+            'tax' => '7',
+        ]);
+
+        $this->assertEquals(new GrossPrice(650, 7), $form->getData());
+    }
+
     public function testTransformCompoundRootFormToViewDataUsingReadPropertyPath(): void
     {
         $form = $this->createForm(GrossPriceType::class, new GrossPrice(500, 19), [
@@ -211,6 +247,29 @@ class ValueObjectsTest extends TestCase
         $this->assertSame(7, $grossPrice->taxRate());
     }
 
+    public function testReverseTransformCompoundRootFormToNormDataUsingConstructorWithArgumentName(): void
+    {
+        $form = $this->createForm(GrossPriceType::class, null, [
+            'factory' => GrossPrice::class,
+            'immutable' => true,
+            'tax_rate_field_name' => 'tax',
+            'tax_rate_field_options' => [
+                'factory_argument' => 'taxRate',
+                'read_property_path' => 'taxRate',
+            ],
+        ]);
+        $form->submit([
+            'amount' => '650',
+            'tax' => '7',
+        ]);
+
+        $grossPrice = $form->getData();
+
+        $this->assertInstanceOf(GrossPrice::class, $grossPrice);
+        $this->assertSame(650, $grossPrice->amount());
+        $this->assertSame(7, $grossPrice->taxRate());
+    }
+
     public function testReverseTransformCompoundRootFormToNormDataUsingFactoryMethod(): void
     {
         $form = $this->createForm(GrossPriceType::class, new GrossPrice(500, 19), [
@@ -220,6 +279,29 @@ class ValueObjectsTest extends TestCase
         $form->submit([
             'amount' => '650',
             'taxRate' => '7',
+        ]);
+
+        $grossPrice = $form->getData();
+
+        $this->assertInstanceOf(GrossPrice::class, $grossPrice);
+        $this->assertSame(650, $grossPrice->amount());
+        $this->assertSame(7, $grossPrice->taxRate());
+    }
+
+    public function testReverseTransformCompoundRootFormToNormDataUsingFactoryMethodWithArgumentName(): void
+    {
+        $form = $this->createForm(GrossPriceType::class, null, [
+            'factory' => [GrossPrice::class, 'withAmountAndTaxRate'],
+            'immutable' => true,
+            'tax_rate_field_name' => 'tax',
+            'tax_rate_field_options' => [
+                'factory_argument' => 'taxRate',
+                'read_property_path' => 'taxRate',
+            ],
+        ]);
+        $form->submit([
+            'amount' => '650',
+            'tax' => '7',
         ]);
 
         $grossPrice = $form->getData();

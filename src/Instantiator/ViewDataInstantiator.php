@@ -34,8 +34,8 @@ class ViewDataInstantiator extends ObjectInstantiator
 
         $this->form = $form;
         $this->viewData = $viewData;
-
         $this->formNameForArgument = [];
+
         foreach ($form as $name => $child) {
             $this->formNameForArgument[$child->getOption('factory_argument') ?? $child->getName()] = $child->getName();
         }

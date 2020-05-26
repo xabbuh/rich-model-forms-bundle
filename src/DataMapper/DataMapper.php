@@ -64,8 +64,6 @@ final class DataMapper implements DataMapperInterface
                 $form->setData($propertyMapper->readPropertyValue($data));
             } elseif (null !== $readPropertyPath) {
                 $form->setData($form->getConfig()->getData());
-            } elseif (null !== $form->getConfig()->getOption('factory_argument')) {
-                $form->setData($data[$form->getName()] ?? null);
             } else {
                 $formsToBeMapped[] = $form;
             }
